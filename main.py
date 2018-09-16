@@ -88,8 +88,10 @@ def convert_pot(adc_reading):
 
 
 def convert_ldr(adc_reading):
-    norm = adc_reading-30
-    total = 750.0-30.0
+    min_value = 30 #reading on ADC when no light
+    norm = adc_reading-min_value
+    max_value = 750 # reading on ADC with phone torch directly on it
+    total = max_value-min_value
     return round((norm/total)*100)
 
 
@@ -102,8 +104,6 @@ print('-' * 57)
 try:
     while True:
         # Read all the ADC channel values in a list.
-        
-
         values = [0]*8
         values[0] = time.strftime('%H:%M:%S')
         values[1] = datetime.fromtimestamp(timer).strftime('%H:%M:%S')
@@ -119,5 +119,6 @@ try:
             print('| {0:>8} | {1:>8} | {2:>4} V | {3:>4} | {4:>5}% |'.format(*values))
         # Pause for half a second.
         time.sleep(freq)
+
 except KeyboardInterrupt:
     GPIO.cleanup()
