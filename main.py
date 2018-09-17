@@ -94,6 +94,11 @@ def convert_ldr(adc_reading):
     total = max_value-min_value
     return round((norm/total)*100)
 
+def convert_temp(adc_reading):
+    # TODO: Convert ADC reading to temperature
+    temp = 5*10
+    return temp
+
 
 print('Reading MCP3008 values, press Ctrl-C to quit...')
 # Print nice channel column headers.
@@ -108,7 +113,7 @@ try:
         values[0] = time.strftime('%H:%M:%S')
         values[1] = datetime.fromtimestamp(timer).strftime('%H:%M:%S')
         values[2] = convert_pot(mcp.read_adc(7))
-        values[3] = mcp.read_adc(6)
+        values[3] = convert_temp(mcp.read_adc(6))
         values[4] = convert_ldr(mcp.read_adc(5))
 
         if len(readings) <= 5:
