@@ -44,7 +44,8 @@ def change_freq(channel=False):
 def stop(channel=False):
     global on, readings
     readings = []
-    on =  not on
+    on = not on
+
 
 def display(channel=False):
     print("FIRST FIVE READINGS SINCE LAST STOP")
@@ -58,8 +59,8 @@ GPIO.setmode(GPIO.BCM)
 
 FREQ_PIN = 21
 RESET_PIN = 20
-STOP_PIN=16
-DISPLAY_PIN=12
+STOP_PIN = 16
+DISPLAY_PIN = 12
 
 GPIO.setup(FREQ_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.add_event_detect(FREQ_PIN, GPIO.RISING,
@@ -88,41 +89,57 @@ def convert_pot(adc_reading):
 
 
 def convert_ldr(adc_reading):
-    min_value = 30 #reading on ADC when no light
+    min_value = 30.0  # reading on ADC when no light
     norm = adc_reading-min_value
-    max_value = 750 # reading on ADC with phone torch directly on it
+
+    max_value = 750.0  # reading on ADC with phone torch directly on it
     total = max_value-min_value
+    if norm < 0:
+        norm = 0
+    elif norm > max_value:
+        norm = total
     return round((norm/total)*100)
 
+
 def convert_temp(adc_reading):
-    # TODO: Convert ADC reading to temperature
-    temp = 5*10
-    return temp
+    voltage = adc_reading*3.3/1024.0
+    ref_voltage = voltage - 0.5
+    temp = ref_voltage/0.01
+    return round(temp, 0)
+
+
+def convert_timer(val):
+    hours, rem = divmod(val, 3600)
+    minutes, seconds = divmod(rem, 60)
+    return ("{:0>2}:{:0>2}:{:02.0f}".format(int(hours), int(minutes), seconds))
 
 
 print('Reading MCP3008 values, press Ctrl-C to quit...')
 # Print nice channel column headers.
 column_headers = ['Time', 'Timer', 'Pot', 'Temp', 'Light']
-print('| {0:>8} | {1:>8} | {2:>6} | {3:>4} | {4:>6} |'.format(*column_headers))
+print('| {0:>8} | {1:>8} | {2:>6} | {3:>5} | {4:>6} |'.format(*column_headers))
 print('-' * 57)
 # Main program loop.
 try:
     while True:
         # Read all the ADC channel values in a list.
         values = [0]*8
-        values[0] = time.strftime('%H:%M:%S')
-        values[1] = datetime.fromtimestamp(timer).strftime('%H:%M:%S')
+        values[0] = datetime.now().strftime("%H:%M:%S")
+        values[1] = convert_timer(timer)
         values[2] = convert_pot(mcp.read_adc(7))
         values[3] = convert_temp(mcp.read_adc(6))
         values[4] = convert_ldr(mcp.read_adc(5))
 
         if len(readings) <= 5:
-            readings.append('| {0:>8} | {1:>8} | {2:>4} V | {3:>4} | {4:>5}% |'.format(*values))
+            readings.append(
+                '| {0:>8} | {1:>8} | {2:>4} V | {3:>5} | {4:>5}% |'.format(*values))
 
         # Print the ADC values.
         if on:
-            print('| {0:>8} | {1:>8} | {2:>4} V | {3:>4} | {4:>5}% |'.format(*values))
+            print(
+                '| {0:>8} | {1:>8} | {2:>4} V | {3:>5}C | {4:>5}% |'.format(*values))
         # Pause for half a second.
+        timer += freq
         time.sleep(freq)
 
 except KeyboardInterrupt:

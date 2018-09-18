@@ -1,6 +1,6 @@
 {
     "remotePath": "/home/pi/uni/eee3096s/lab4",
-    "host": "192.168.8.103",
+    "host": "192.168.4.1",
     "username": "pi",
     "password": "tam123ir.",
     "port": 22,
