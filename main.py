@@ -6,7 +6,6 @@ import os
 # Import SPI library (for hardware SPI) and MCP3008 library.
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_MCP3008
-
 import RPi.GPIO as GPIO
 
 # Software SPI configuration:
@@ -44,6 +43,7 @@ def stop(channel=False):
     global on, readings
     readings = []
     on = not on
+
 
 
 def display(channel=False):
