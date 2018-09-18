@@ -32,7 +32,6 @@ def reset(channel=False):
 
 def change_freq(channel=False):
     global freq
-    print(freq)
     if freq == 0.5:
         freq = 1
     elif freq == 1:
