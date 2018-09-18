@@ -47,6 +47,7 @@ def stop(channel=False):
     readings = []
     on =  not on
 
+
 def display(channel=False):
     print("FIRST FIVE READINGS SINCE LAST STOP")
     global readings
